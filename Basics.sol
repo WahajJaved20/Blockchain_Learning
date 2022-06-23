@@ -26,7 +26,36 @@ contract SimpleStorage {
     function retrieve() public view returns(uint256){
         return favoriteNumber;
     }
+    // Creating Structures
+    struct People{
+        uint256 favoriteNumber;
+        string name;
+    }
+    //creating a struct object
+    People public person = People({favoriteNumber: 23,name:"Wahaj"});
+    // creating an Array
+    People[] public people;
+    // CREATING MAPS
+    //we will be telling what kind of mappings to do
+    mapping(string => uint256) public nameToNumber;
+    // Adding people into our array and map
+    function addPerson(string memory name,uint256 _favoriteNumber) public {
+        // will get to memory later 
+        People memory newPerson = People({favoriteNumber: _favoriteNumber,name : name});
+        people.push(newPerson);
+        nameToNumber[name] = _favoriteNumber;
+    }
+    // Storage Locations (right now only these 3) usually specified for array,structs or mappings
+    // memory(telling that its temporary,can be reassigned), calldata(temporary,cannot be reassigned)
+    //, storage(default, persistent data) 
+    // since string is an array of bytes, we will be using memory keyword
+
+   
 }
-// contract Address : 0xdBA793F5A8273608e662ecCce312C5b879DC9b2B
 // after deployment, the functions pop up as little buttons we can make transactions
 // which are like calling these functions from the sidebar
+
+// Deploying to a real test net
+// Select the web3 inject first connect the metamask account
+// now rinkeby connection is established
+// now deploy and boom
