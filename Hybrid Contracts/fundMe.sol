@@ -15,6 +15,19 @@ contract FundMe{
     // list of funders who sent us money
     address[] public funders;
     mapping(address => uint256) addressToFunds;
+    // set up an owner so only he can withdraw funds
+    address public owner;
+    // simple constructor to set up the owner (same as other langs)
+    constructor(){
+        owner = msg.sender;
+    }
+    // a modifier function so we can put it in function declarations for reusability
+    modifier onlyOwner{
+        require(msg.sender == owner,"Sender is not owner");
+        // this underscore is necessary, it means do the rest of code
+        // if this was above require then the wholecode is executed first then require is called
+        _;
+    }
     // function to let people send 
     // payable keyword allows us to send actual money
     function fund() public payable{
@@ -32,5 +45,28 @@ contract FundMe{
     }
    
     // function for contract owner to withdraw money
-    function withdraw() public {}
+    // with the only owner, the owner can only call it now
+    function withdraw() public onlyOwner{
+        // loop to clear out the lists
+        for(uint256 i=0;i<funders.length;i++){
+            addressToFunds[funders[i]] = 0;
+        }
+        funders = new address[](0);
+        // withdrawing funds from contracts can be done in one of the three ways
+        //1) transfer (if it fails it gives an error)
+        // payable(msg.sender).transfer(address(this).balance);
+        // msg . sender is us and (this) is the giver
+        //2) send (it returns a boolean)
+        // bool sendSuccess = payable(msg.sender).send(address(this).balance);
+        // // display an error if it couldnt send
+        // require(sendSuccess,"Couldnt send");
+        //3) call(returns bool and anything the other function called) (RECOMMENDED WAY)
+        //value field takes the amount we are going to send and the empty quotes tell that we are not sending
+        // any functions coz we dont need here
+        (bool callSuccess,) = payable(msg.sender).call{value: address(this).balance}("");
+        require(callSuccess,"Coudnt call");
+        // to make the address pay us, we need to typecast into payable addresses
+        // balance = the current value in ETH
+        
+    }
 }
