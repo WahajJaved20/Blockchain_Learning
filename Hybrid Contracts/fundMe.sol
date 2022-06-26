@@ -11,19 +11,20 @@ contract FundMe{
     using PriceConverter for uint256;
     // the minimum amount of money we are setting
     // we meed to convert this money into eth form so the transactions are possible
-    uint256 minimumUSD = 50;
+    uint256 constant public MINIMUM_USD = 50 * 1e18;
     // list of funders who sent us money
     address[] public funders;
     mapping(address => uint256) addressToFunds;
     // set up an owner so only he can withdraw funds
-    address public owner;
+    address immutable public i_owner;
+    //immutable only declared in constructors
     // simple constructor to set up the owner (same as other langs)
     constructor(){
-        owner = msg.sender;
+        i_owner = msg.sender;
     }
     // a modifier function so we can put it in function declarations for reusability
     modifier onlyOwner{
-        require(msg.sender == owner,"Sender is not owner");
+        require(msg.sender == i_owner,"Sender is not owner");
         // this underscore is necessary, it means do the rest of code
         // if this was above require then the wholecode is executed first then require is called
         _;
@@ -34,7 +35,7 @@ contract FundMe{
         // setting up a minimum amount
         // msg.value is global and determines how much ETH is transferred
         // library functions consider the caller as the first parameter
-        require(msg.value.getConversionRate() > minimumUSD,"Didnt send enough"); // 1e18 == 1 *10**18 == 1000000000000000000 wei
+        require(msg.value.getConversionRate() > MINIMUM_USD,"Didnt send enough"); // 1e18 == 1 *10**18 == 1000000000000000000 wei
         // money math is done in terms of wei so and 1exponent 18 wei is 1 eth 
         // and we are setting 1 eth as the minimum amount
         // the second arg describes what to show when error is encountered
@@ -68,5 +69,17 @@ contract FundMe{
         // to make the address pay us, we need to typecast into payable addresses
         // balance = the current value in ETH
         
+    }
+    // a way to work out transactions when no data is specified ( like sending ETH via metamask instead of
+    // using the contract functions
+    // 1) recieve
+    receive() external payable{
+        fund();
+        // this is called when no data is sent in a transaction (no function call)
+    }
+    // 2) fallback
+    fallback() external payable{
+        fund();
+        // this is called when some data is sent but the function doesnt exist
     }
 }
