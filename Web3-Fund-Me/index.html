@@ -1,0 +1,19 @@
+<!-- this is going to be the base page for our web3 app-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Fund Me App</title>
+</head>
+<body>
+    Hi
+    <script src = "./index.js" type = "module">
+        // since type is now module we cant directly import functions for buttons
+    </script>
+    <button id = "connect-button">Connect to Metamask</button>
+    <button id = "balance-button">getBalance</button>
+    <button id = "withdraw-button">withdraw</button>
+    <label for = "fund" > ETH Amount</label>
+    <input id = "ethAmount" placeholder="0.2"/>
+    <button id = "fund-button">Fund</button>
+</body>
+</html>
